@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>华谷里足球俱乐部 · 分组</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      touch-action: pan-y;
+    }
+    .app {
+      max-width: 1200px;
+      width: 100%;
+      background: white;
+      border-radius: 32px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 6px 12px rgba(0, 0, 0, 0.05);
+      padding: 28px 32px 32px;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .subhead {
+      color: #64748b;
+      font-size: 15px;
+      margin-bottom: 24px;
+      border-left: 4px solid #3b82f6;
+      padding: 10px 16px;
+      background: #f8fafc;
+      border-radius: 0 8px 8px 0;
+    }
+    /* 修复控件区域布局 */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px 20px;
+      align-items: flex-end;
+      background: #f8fafc;
+      padding: 18px 20px;
+      border-radius: 20px;
+      margin-bottom: 28px;
+      border: 1px solid #e2e8f0;
+    }
+    .control-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 0 1 auto;
+    }
+    .control-item label {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: #475569;
+    }
+    .control-item select, .color-swap-select {
+      background: white;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #0f172a;
+      width: 100%;
+      min-width: 120px;
+      transition: 0.15s;
+      outline: none;
+    }
+    .color-swap-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .color-swap-group select {
+      width: auto;
+      min-width: 90px;
+      flex: 1 1 80px;
+    }
+    .swap-btn {
+      background: #e2e8f0;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+      font-size: 15px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .swap-btn:hover {
+      background: #3b82f6;
+      color: white;
+    }
+    /* 弹性分配：颜色互换区域占满剩余空间，总球员右对齐 */
+    .control-item.flex-grow {
+      flex: 1 1 280px;
+    }
+    .total-badge-wrapper {
+      flex: 0 0 auto;
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+    }
+    .badge {
+      background: #e2e8f0;
+      color: #334155;
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    #totalPlayersSpan {
+      font-size: 15px;
+      padding: 8px 18px;
+      white-space: nowrap;
+    }
+    /* 球员池 */
+    .player-pool {
+      margin-bottom: 24px;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .section-header h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    .tier-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .tier-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px 12px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: 0.1s;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .tier-card.T0 { border-top: 5px solid #b91c1c; }
+    .tier-card.T1 { border-top: 5px solid #ea580c; }
+    .tier-card.T2 { border-top: 5px solid #ca8a04; }
+    .tier-card.T3 { border-top: 5px solid #0d9488; }
+    .tier-card.T4 { border-top: 5px solid #4f46e5; }
+    .tier-label {
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+    .tier-card.T0 .tier-label { color: #b91c1c; }
+    .tier-card.T1 .tier-label { color: #ea580c; }
+    .tier-card.T2 .tier-label { color: #ca8a04; }
+    .tier-card.T3 .tier-label { color: #0d9488; }
+    .tier-card.T4 .tier-label { color: #4f46e5; }
+    .tier-count {
+      font-size: 14px;
+      color: #475569;
+      background: #f1f5f9;
+      padding: 4px 10px;
+      border-radius: 30px;
+      font-weight: 500;
+      margin-top: 4px;
+    }
+    .players-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin: 10px 0 6px;
+      min-height: 32px;
+      max-height: 120px;
+      overflow-y: auto;
+      width: 100%;
+      padding: 2px 0;
+      scrollbar-width: thin;
+    }
+    .players-tags::-webkit-scrollbar { width: 4px; }
+    .players-tags::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .player-tag {
+      background: #f1f5f9;
+      color: #1e293b;
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid #cbd5e1;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      max-width: 100%;
+      word-break: break-word;
+    }
+    .player-tag .remove-player {
+      cursor: pointer;
+      font-weight: 700;
+      color: #94a3b8;
+      transition: 0.1s;
+      font-size: 16px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .player-tag .remove-player:hover { color: #dc2626; }
+    .add-player-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      width: 100%;
+    }
+    .add-player-row input {
+      flex: 1;
+      padding: 8px 10px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      transition: 0.15s;
+      min-width: 0;
+    }
+    .add-player-row input:focus { border-color: #3b82f6; }
+    .add-player-row button {
+      background: #e2e8f0;
+      border: none;
+      border-radius: 10px;
+      width: 36px;
+      height: 36px;
+      font-size: 20px;
+      font-weight: 500;
+      color: #1e293b;
+      cursor: pointer;
+      transition: 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .add-player-row button:hover { background: #3b82f6; color: white; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      margin: 24px 0 16px;
+    }
+    .btn-primary {
+      background: #0f172a;
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 40px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
+      letter-spacing: 0.3px;
+    }
+    .btn-primary:hover {
+      background: #1e293b;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.2);
+      transform: translateY(-1px);
+    }
+    .btn-primary:active { transform: translateY(1px); }
+    .btn-secondary {
+      background: white;
+      color: #1e293b;
+      border: 1.5px solid #cbd5e1;
+      padding: 14px 28px;
+      border-radius: 40px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .btn-secondary:hover { background: #f8fafc; border-color: #94a3b8; }
+    .validation-msg {
+      font-size: 15px;
+      font-weight: 500;
+      padding: 12px 18px;
+      border-radius: 16px;
+      background: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+      display: inline-block;
+      margin-left: 10px;
+    }
+    .validation-msg.hidden { display: none; }
+    .groups-container {
+      margin-top: 32px;
+      border-top: 2px dashed #e2e8f0;
+      padding-top: 28px;
+    }
+    .groups-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .groups-header h2 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .groups-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .group-card {
+      border-radius: 24px;
+      padding: 20px 18px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+      transition: 0.15s;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .group-card:hover { box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06); }
+
+    /* 分组背景色 */
+    .group-card.group-1 { background-color: #ffffff; }
+    .group-card.group-2 { background-color: #ef4444; color: #ffffff; }
+    .group-card.group-3 { background-color: #3b82f6; color: #ffffff; }
+    .group-card.group-4 { background-color: #a3e635; color: #1e293b; }
+    .group-card.group-5 { background-color: #000000; color: #ffffff; }
+
+    /* 深色背景文字适配 */
+    .group-card.group-2 .group-title,
+    .group-card.group-2 .group-members,
+    .group-card.group-2 .group-power,
+    .group-card.group-2 .group-avg,
+    .group-card.group-2 .member-tag,
+    .group-card.group-3 .group-title,
+    .group-card.group-3 .group-members,
+    .group-card.group-3 .group-power,
+    .group-card.group-3 .group-avg,
+    .group-card.group-3 .member-tag,
+    .group-card.group-5 .group-title,
+    .group-card.group-5 .group-members,
+    .group-card.group-5 .group-power,
+    .group-card.group-5 .group-avg,
+    .group-card.group-5 .member-tag {
+      color: #ffffff;
+    }
+    .group-card.group-2 .member-tag,
+    .group-card.group-3 .member-tag,
+    .group-card.group-5 .member-tag {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+    }
+    .group-card.group-2 .group-power,
+    .group-card.group-2 .group-avg,
+    .group-card.group-3 .group-power,
+    .group-card.group-3 .group-avg,
+    .group-card.group-5 .group-power,
+    .group-card.group-5 .group-avg {
+      background: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+    }
+    .group-card.group-2 .member-tier,
+    .group-card.group-3 .member-tier,
+    .group-card.group-5 .member-tier {
+      background: rgba(0, 0, 0, 0.3);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+    }
+    /* 黄绿色组 */
+    .group-card.group-4 .group-title,
+    .group-card.group-4 .group-members,
+    .group-card.group-4 .group-power,
+    .group-card.group-4 .group-avg,
+    .group-card.group-4 .member-tag {
+      color: #1e293b;
+    }
+    .group-card.group-4 .member-tag {
+      background: rgba(255, 255, 255, 0.7);
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+    .group-card.group-4 .group-power,
+    .group-card.group-4 .group-avg {
+      background: rgba(255, 255, 255, 0.7);
+      color: #1e293b;
+    }
+
+    .group-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+    .group-power {
+      font-size: 14px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 40px;
+      background: #eef2ff;
+      color: #4338ca;
+    }
+    .group-avg {
+      font-size: 14px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 40px;
+      background: #ecfdf5;
+      color: #047857;
+      margin-left: 6px;
+    }
+    .group-members {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 10px;
+      align-items: center;
+      min-height: 60px;
+      transition: background 0.1s;
+      border-radius: 16px;
+      padding: 4px;
+    }
+    .group-members.drag-over {
+      background: rgba(59, 130, 246, 0.15);
+      outline: 2px dashed #3b82f6;
+    }
+    .member-tag {
+      background: #f8fafc;
+      border-radius: 40px;
+      padding: 6px 14px;
+      font-size: 14px;
+      font-weight: 500;
+      border: 1px solid #e2e8f0;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: grab;
+      user-select: none;
+      transition: 0.1s;
+      touch-action: none;
+      position: relative;
+      z-index: 1;
+    }
+    .member-tag.dragging {
+      opacity: 0.4;
+      cursor: grabbing;
+    }
+    .member-tag:active {
+      cursor: grabbing;
+    }
+    .member-tier {
+      font-size: 11px;
+      font-weight: 700;
+      background: #ffffff;
+      padding: 2px 6px;
+      border-radius: 20px;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+    }
+    .empty-groups {
+      color: #94a3b8;
+      font-style: italic;
+      padding: 40px 0;
+      text-align: center;
+      background: #f8fafc;
+      border-radius: 20px;
+    }
+    .group-badge {
+      font-size: 12px;
+      background: rgba(255,255,255,0.3);
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+    /* 移动端进一步优化 */
+    @media (max-width: 600px) {
+      .app {
+        padding: 20px 16px;
+      }
+      h1 {
+        font-size: 22px;
+      }
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+      }
+      .control-item {
+        flex: 1 1 auto;
+      }
+      .control-item.flex-grow {
+        flex: 1 1 auto;
+      }
+      .total-badge-wrapper {
+        margin-left: 0;
+        justify-content: flex-end;
+      }
+      .color-swap-group {
+        flex-wrap: wrap;
+      }
+      .color-swap-group select {
+        flex: 1 1 70px;
+        min-width: 70px;
+      }
+      .swap-btn {
+        padding: 10px 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <h1>华谷里随机分组</h1>
+
+  <div class="controls">
+    <div class="control-item">
+      <label>分组数量</label>
+      <select id="groupCountSelect">
+        <option value="3" selected>3 组</option>
+        <option value="4" >4 组</option>
+        <option value="5">5 组</option>
+      </select>
+    </div>
+    <div class="control-item flex-grow">
+      <label>小组颜色互换</label>
+      <div class="color-swap-group">
+        <select id="swapGroupA" class="color-swap-select">
+          <option value="0">1组</option>
+          <option value="1">2组</option>
+          <option value="2">3组</option>
+          <option value="3">4组</option>
+          <option value="4">5组</option>
+        </select>
+        <span style="font-weight:600; color:#475569;">⇄</span>
+        <select id="swapGroupB" class="color-swap-select">
+          <option value="1">2组</option>
+          <option value="2">3组</option>
+          <option value="3">4组</option>
+          <option value="4">5组</option>
+        </select>
+        <button class="swap-btn" id="swapColorsBtn">互换颜色</button>
+      </div>
+    </div>
+    <div class="total-badge-wrapper">
+      <span id="totalPlayersSpan" class="badge">总球员: 0</span>
+    </div>
+  </div>
+
+  <div class="player-pool">
+    <div class="section-header">
+      <h2>📋 球员池</h2>
+      <span class="badge">按等级添加</span>
+    </div>
+    <div class="tier-grid" id="tierGrid"></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-primary" id="generateBtn">✨ 自动分组</button>
+    <button class="btn-secondary" id="clearBtn">清空所有球员</button>
+    <span id="validationMsg" class="validation-msg hidden"></span>
+  </div>
+
+  <div class="groups-container">
+    <div class="groups-header">
+      <h2>🏆 分组结果 </h2>
+    </div>
+    <div id="groupsGrid" class="groups-grid">
+      <div class="empty-groups">点击「自动分组」生成平衡队伍</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const TIER_WEIGHT = { T0: 10, T1: 8, T2: 6, T3: 4, T4: 2 };
+    const TIERS = ['T0', 'T1', 'T2', 'T3', 'T4'];
+
+    let players = [];
+    let nextId = 1;
+    const playerMap = new Map();
+
+    let currentGroups = [];
+    let groupColorIndices = [1, 2, 3, 4, 5];
+
+    const tierGrid = document.getElementById('tierGrid');
+    const groupCountSelect = document.getElementById('groupCountSelect');
+    const totalPlayersSpan = document.getElementById('totalPlayersSpan');
+    const generateBtn = document.getElementById('generateBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const validationMsg = document.getElementById('validationMsg');
+    const groupsGrid = document.getElementById('groupsGrid');
+    const swapGroupA = document.getElementById('swapGroupA');
+    const swapGroupB = document.getElementById('swapGroupB');
+    const swapColorsBtn = document.getElementById('swapColorsBtn');
+
+    // ---------- 渲染等级卡片 ----------
+    function renderTierCards() {
+      tierGrid.innerHTML = '';
+      TIERS.forEach(tier => {
+        const card = document.createElement('div');
+        card.className = `tier-card ${tier}`;
+        card.dataset.tier = tier;
+
+        const label = document.createElement('div');
+        label.className = 'tier-label';
+        label.textContent = tier;
+
+        const countSpan = document.createElement('div');
+        countSpan.className = 'tier-count';
+        countSpan.id = `count-${tier}`;
+        countSpan.textContent = '0 人';
+
+        const tagsContainer = document.createElement('div');
+        tagsContainer.className = 'players-tags';
+        tagsContainer.id = `tags-${tier}`;
+
+        const addRow = document.createElement('div');
+        addRow.className = 'add-player-row';
+
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.placeholder = '球员名';
+        nameInput.id = `input-${tier}`;
+        nameInput.maxLength = 20;
+
+        const addBtn = document.createElement('button');
+        addBtn.textContent = '+';
+        addBtn.type = 'button';
+
+        addBtn.addEventListener('click', () => {
+          const name = nameInput.value.trim();
+          if (!name) { showValidation('请输入球员名称'); return; }
+          addPlayer(name, tier);
+          nameInput.value = '';
+          nameInput.focus();
+          hideValidation();
+        });
+
+        nameInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') { e.preventDefault(); addBtn.click(); }
+        });
+
+        addRow.appendChild(nameInput);
+        addRow.appendChild(addBtn);
+
+        card.appendChild(label);
+        card.appendChild(countSpan);
+        card.appendChild(tagsContainer);
+        card.appendChild(addRow);
+
+        tierGrid.appendChild(card);
+      });
+    }
+
+    function addPlayer(name, tier) {
+      const id = nextId++;
+      const player = { id, name, tier };
+      players.push(player);
+      playerMap.set(id, player);
+      renderTierPlayers(tier);
+      updateTotalCount();
+      hideValidation();
+      clearGroupsDisplay();
+    }
+
+    function removePlayer(id) {
+      const player = playerMap.get(id);
+      if (!player) return;
+      const tier = player.tier;
+      players = players.filter(p => p.id !== id);
+      playerMap.delete(id);
+      renderTierPlayers(tier);
+      updateTotalCount();
+      clearGroupsDisplay();
+      hideValidation();
+    }
+
+    function renderTierPlayers(tier) {
+      const container = document.getElementById(`tags-${tier}`);
+      const countSpan = document.getElementById(`count-${tier}`);
+      if (!container || !countSpan) return;
+
+      const tierPlayers = players.filter(p => p.tier === tier);
+      container.innerHTML = '';
+      tierPlayers.forEach(p => {
+        const tag = document.createElement('span');
+        tag.className = 'player-tag';
+        tag.innerHTML = `${escapeHtml(p.name)} <span class="remove-player" data-id="${p.id}" title="移除">✕</span>`;
+        container.appendChild(tag);
+      });
+
+      container.querySelectorAll('.remove-player').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = Number(btn.dataset.id);
+          removePlayer(id);
+        });
+      });
+
+      countSpan.textContent = `${tierPlayers.length} 人`;
+    }
+
+    function updateTotalCount() {
+      totalPlayersSpan.textContent = `总球员: ${players.length}`;
+    }
+
+    function clearAllPlayers() {
+      players = [];
+      playerMap.clear();
+      nextId = 1;
+      TIERS.forEach(tier => renderTierPlayers(tier));
+      updateTotalCount();
+      clearGroupsDisplay();
+      hideValidation();
+      currentGroups = [];
+      groupColorIndices = [1, 2, 3, 4, 5];
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function showValidation(msg) {
+      validationMsg.textContent = msg;
+      validationMsg.classList.remove('hidden');
+    }
+    function hideValidation() {
+      validationMsg.classList.add('hidden');
+    }
+
+    function clearGroupsDisplay() {
+      groupsGrid.innerHTML = '<div class="empty-groups">点击「自动分组」生成平衡队伍</div>';
+      currentGroups = [];
+    }
+
+    function shuffleArray(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    // ---------- 核心分组算法 ----------
+    function generateGroups() {
+      const playerCount = players.length;
+
+      if (playerCount < 15) {
+        showValidation(`参与人数至少 15 人，当前 ${playerCount} 人`);
+        return;
+      }
+
+      const groupCount = Number(groupCountSelect.value);
+      if (groupCount < 3 || groupCount > 5) {
+        showValidation('分组数量必须在 3~5 组之间');
+        return;
+      }
+
+      const baseSize = Math.floor(playerCount / groupCount);
+      const remainder = playerCount % groupCount;
+      const targetSizes = [];
+      for (let i = 0; i < groupCount; i++) {
+        targetSizes.push(baseSize + (i < remainder ? 1 : 0));
+      }
+
+      const sortedPlayers = [...players].sort((a, b) => {
+        const wA = TIER_WEIGHT[a.tier] || 0;
+        const wB = TIER_WEIGHT[b.tier] || 0;
+        if (wA !== wB) return wB - wA;
+        return Math.random() - 0.5;
+      });
+
+      const groupStates = targetSizes.map((size) => ({
+        players: [],
+        sum: 0,
+        count: 0,
+        targetSize: size,
+      }));
+
+      for (let i = 0; i < sortedPlayers.length; i++) {
+        const player = sortedPlayers[i];
+        const weight = TIER_WEIGHT[player.tier] || 0;
+
+        let candidates = groupStates
+          .map((g, idx) => ({ idx, group: g }))
+          .filter(item => item.group.count < item.group.targetSize);
+
+        if (candidates.length === 0) break;
+
+        const avgs = candidates.map(c => {
+          const g = c.group;
+          return g.count === 0 ? 0 : g.sum / g.count;
+        });
+        const minAvg = Math.min(...avgs);
+        const bestCandidates = candidates.filter((c) => {
+          const g = c.group;
+          const avg = g.count === 0 ? 0 : g.sum / g.count;
+          return Math.abs(avg - minAvg) < 1e-9;
+        });
+
+        const chosen = bestCandidates[Math.floor(Math.random() * bestCandidates.length)];
+
+        const target = groupStates[chosen.idx];
+        target.players.push(player);
+        target.sum += weight;
+        target.count += 1;
+      }
+
+      function getAverages(groups) {
+        return groups.map(g => g.count === 0 ? 0 : g.sum / g.count);
+      }
+
+      function tryRandomSwaps(times) {
+        for (let t = 0; t < times; t++) {
+          const i = Math.floor(Math.random() * groupCount);
+          let j = Math.floor(Math.random() * groupCount);
+          if (i === j) continue;
+          const groupA = groupStates[i];
+          const groupB = groupStates[j];
+          if (groupA.players.length === 0 || groupB.players.length === 0) continue;
+
+          const ai = Math.floor(Math.random() * groupA.players.length);
+          const bi = Math.floor(Math.random() * groupB.players.length);
+          const pA = groupA.players[ai];
+          const pB = groupB.players[bi];
+          const wA = TIER_WEIGHT[pA.tier] || 0;
+          const wB = TIER_WEIGHT[pB.tier] || 0;
+
+          const newSumA = groupA.sum - wA + wB;
+          const newSumB = groupB.sum - wB + wA;
+
+          const avgs = getAverages(groupStates);
+          const oldMax = Math.max(...avgs);
+          const oldMin = Math.min(...avgs);
+          const oldRange = oldMax - oldMin;
+
+          const avgsCopy = [...avgs];
+          avgsCopy[i] = groupA.count === 0 ? 0 : newSumA / groupA.count;
+          avgsCopy[j] = groupB.count === 0 ? 0 : newSumB / groupB.count;
+          const newMax = Math.max(...avgsCopy);
+          const newMin = Math.min(...avgsCopy);
+          const newRange = newMax - newMin;
+
+          const temperature = 0.05;
+          if (newRange < oldRange || (newRange === oldRange && Math.random() < 0.5) || (newRange > oldRange && Math.random() < Math.exp(-(newRange - oldRange) / temperature) * 0.1)) {
+            groupA.players[ai] = pB;
+            groupB.players[bi] = pA;
+            groupA.sum = newSumA;
+            groupB.sum = newSumB;
+          }
+        }
+      }
+
+      tryRandomSwaps(200);
+
+      const maxIter = 8000;
+      let improved = true;
+      let iterations = 0;
+
+      while (improved && iterations < maxIter) {
+        improved = false;
+        iterations++;
+
+        const avgs = getAverages(groupStates);
+        const maxAvg = Math.max(...avgs);
+        const minAvg = Math.min(...avgs);
+        const currentRange = maxAvg - minAvg;
+
+        if (currentRange < 0.01) break;
+
+        const pairs = [];
+        for (let i = 0; i < groupCount; i++) {
+          for (let j = i + 1; j < groupCount; j++) {
+            pairs.push([i, j]);
+          }
+        }
+        const shuffledPairs = shuffleArray(pairs);
+
+        outerLoop:
+        for (const [i, j] of shuffledPairs) {
+          const groupA = groupStates[i];
+          const groupB = groupStates[j];
+
+          const indicesA = shuffleArray([...Array(groupA.players.length).keys()]);
+          const indicesB = shuffleArray([...Array(groupB.players.length).keys()]);
+
+          for (const ai of indicesA) {
+            for (const bi of indicesB) {
+              const pA = groupA.players[ai];
+              const pB = groupB.players[bi];
+              const wA = TIER_WEIGHT[pA.tier] || 0;
+              const wB = TIER_WEIGHT[pB.tier] || 0;
+
+              const newSumA = groupA.sum - wA + wB;
+              const newSumB = groupB.sum - wB + wA;
+
+              const avgsCopy = [...avgs];
+              avgsCopy[i] = groupA.count === 0 ? 0 : newSumA / groupA.count;
+              avgsCopy[j] = groupB.count === 0 ? 0 : newSumB / groupB.count;
+              const newMax = Math.max(...avgsCopy);
+              const newMin = Math.min(...avgsCopy);
+              const newRange = newMax - newMin;
+
+              if (newRange < currentRange) {
+                groupA.players[ai] = pB;
+                groupB.players[bi] = pA;
+                groupA.sum = newSumA;
+                groupB.sum = newSumB;
+                improved = true;
+                break outerLoop;
+              }
+            }
+          }
+        }
+      }
+
+      tryRandomSwaps(100);
+
+      currentGroups = groupStates.map((g, idx) => ({
+        players: [...g.players],
+        sum: g.sum,
+        count: g.count,
+        targetSize: g.targetSize,
+      }));
+
+      groupColorIndices = Array.from({ length: groupCount }, (_, i) => i + 1);
+
+      renderGroups(currentGroups);
+      hideValidation();
+    }
+
+    function renderGroups(groups) {
+      if (!groups || groups.length === 0) {
+        groupsGrid.innerHTML = '<div class="empty-groups">无分组数据</div>';
+        return;
+      }
+
+      let html = '';
+      groups.forEach((group, idx) => {
+        const shuffledMembers = shuffleArray(group.players);
+        const membersHtml = shuffledMembers.map(p => {
+          return `<span class="member-tag" draggable="true" data-player-id="${p.id}" data-tier="${p.tier}">
+            ${escapeHtml(p.name)}
+          </span>`;
+        }).join('');
+
+        const colorIdx = groupColorIndices[idx] || (idx + 1);
+        const groupClass = `group-${colorIdx}`;
+
+        html += `
+          <div class="group-card ${groupClass}" data-group-index="${idx}">
+            <div class="group-members" data-group-index="${idx}">
+              ${membersHtml || '<span style="color:#94a3b8;">无球员</span>'}
+            </div>
+          </div>
+        `;
+      });
+
+      groupsGrid.innerHTML = html;
+      attachDragEvents();
+    }
+
+    // ---------- 拖拽功能 (兼容PC和移动端) ----------
+    function attachDragEvents() {
+      const memberTags = document.querySelectorAll('.member-tag');
+      const dropZones = document.querySelectorAll('.group-members');
+
+      memberTags.forEach(tag => {
+        tag.addEventListener('dragstart', handleDragStart);
+        tag.addEventListener('dragend', handleDragEnd);
+        tag.addEventListener('touchstart', handleTouchStart, { passive: false });
+        tag.addEventListener('touchmove', handleTouchMove, { passive: false });
+        tag.addEventListener('touchend', handleTouchEnd);
+        tag.addEventListener('touchcancel', handleTouchEnd);
+      });
+
+      dropZones.forEach(zone => {
+        zone.addEventListener('dragover', handleDragOver);
+        zone.addEventListener('dragleave', handleDragLeave);
+        zone.addEventListener('drop', handleDrop);
+      });
+    }
+
+    let draggedPlayerId = null;
+    let draggedElement = null;
+
+    function handleDragStart(e) {
+      const tag = e.target.closest('.member-tag');
+      if (!tag) return;
+      draggedPlayerId = Number(tag.dataset.playerId);
+      draggedElement = tag;
+      tag.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', draggedPlayerId);
+    }
+
+    function handleDragEnd(e) {
+      const tag = e.target.closest('.member-tag');
+      if (tag) tag.classList.remove('dragging');
+      document.querySelectorAll('.group-members').forEach(z => z.classList.remove('drag-over'));
+      draggedPlayerId = null;
+      draggedElement = null;
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      const zone = e.target.closest('.group-members');
+      if (zone) zone.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+      const zone = e.target.closest('.group-members');
+      if (zone) zone.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      const zone = e.target.closest('.group-members');
+      if (!zone) return;
+      zone.classList.remove('drag-over');
+
+      const targetGroupIndex = Number(zone.dataset.groupIndex);
+      const playerId = Number(e.dataTransfer.getData('text/plain')) || draggedPlayerId;
+      if (isNaN(playerId) || targetGroupIndex === undefined) return;
+
+      movePlayerToGroup(playerId, targetGroupIndex);
+    }
+
+    let touchDraggedPlayerId = null;
+    let touchDraggedElement = null;
+    let touchStartX = 0, touchStartY = 0;
+    let touchMoved = false;
+
+    function handleTouchStart(e) {
+      const tag = e.target.closest('.member-tag');
+      if (!tag) return;
+      touchDraggedPlayerId = Number(tag.dataset.playerId);
+      touchDraggedElement = tag;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchMoved = false;
+    }
+
+    function handleTouchMove(e) {
+      if (!touchDraggedElement) return;
+      const touch = e.touches[0];
+      const dx = touch.clientX - touchStartX;
+      const dy = touch.clientY - touchStartY;
+      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+        touchMoved = true;
+        e.preventDefault();
+        touchDraggedElement.classList.add('dragging');
+      }
+    }
+
+    function handleTouchEnd(e) {
+      if (!touchDraggedElement) return;
+      touchDraggedElement.classList.remove('dragging');
+
+      if (touchMoved) {
+        const touch = e.changedTouches[0];
+        const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+        const dropZone = elementUnder?.closest('.group-members');
+        if (dropZone) {
+          const targetGroupIndex = Number(dropZone.dataset.groupIndex);
+          if (!isNaN(targetGroupIndex)) {
+            movePlayerToGroup(touchDraggedPlayerId, targetGroupIndex);
+          }
+        }
+      }
+
+      touchDraggedPlayerId = null;
+      touchDraggedElement = null;
+      touchMoved = false;
+      document.querySelectorAll('.group-members').forEach(z => z.classList.remove('drag-over'));
+    }
+
+    function movePlayerToGroup(playerId, targetGroupIndex) {
+      const player = playerMap.get(playerId);
+      if (!player) return;
+
+      let sourceGroupIndex = -1;
+      let sourcePlayerIndex = -1;
+
+      for (let i = 0; i < currentGroups.length; i++) {
+        const idx = currentGroups[i].players.findIndex(p => p.id === playerId);
+        if (idx !== -1) {
+          sourceGroupIndex = i;
+          sourcePlayerIndex = idx;
+          break;
+        }
+      }
+
+      if (sourceGroupIndex === -1) return;
+      if (sourceGroupIndex === targetGroupIndex) return;
+
+      const sourceGroup = currentGroups[sourceGroupIndex];
+      const [movedPlayer] = sourceGroup.players.splice(sourcePlayerIndex, 1);
+      const weight = TIER_WEIGHT[movedPlayer.tier] || 0;
+      sourceGroup.sum -= weight;
+      sourceGroup.count -= 1;
+
+      const targetGroup = currentGroups[targetGroupIndex];
+      targetGroup.players.push(movedPlayer);
+      targetGroup.sum += weight;
+      targetGroup.count += 1;
+
+      renderGroups(currentGroups);
+    }
+
+    // ---------- 颜色互换 ----------
+    function swapGroupColors() {
+      if (!currentGroups || currentGroups.length === 0) {
+        showValidation('请先生成小组');
+        return;
+      }
+
+      const idxA = Number(swapGroupA.value);
+      const idxB = Number(swapGroupB.value);
+      const groupCount = currentGroups.length;
+
+      if (idxA >= groupCount || idxB >= groupCount) {
+        showValidation('选择的组不存在，请先生成对应数量的小组');
+        return;
+      }
+      if (idxA === idxB) {
+        showValidation('请选择两个不同的小组');
+        return;
+      }
+
+      [groupColorIndices[idxA], groupColorIndices[idxB]] = [groupColorIndices[idxB], groupColorIndices[idxA]];
+
+      renderGroups(currentGroups);
+      hideValidation();
+    }
+
+    function updateSwapSelectOptions() {
+      const groupCount = Number(groupCountSelect.value);
+      const optionsA = [];
+      const optionsB = [];
+      for (let i = 0; i < groupCount; i++) {
+        optionsA.push(`<option value="${i}">${i+1}组</option>`);
+        optionsB.push(`<option value="${i}">${i+1}组</option>`);
+      }
+      swapGroupA.innerHTML = optionsA.join('');
+      swapGroupB.innerHTML = optionsB.join('');
+      swapGroupA.value = '0';
+      swapGroupB.value = groupCount >= 2 ? '1' : '0';
+      if (groupCount === 1) {
+        swapGroupB.value = '0';
+      }
+    }
+
+    // ---------- 事件绑定 ----------
+    generateBtn.addEventListener('click', generateGroups);
+    clearBtn.addEventListener('click', () => {
+      if (players.length > 0 && !confirm('确定要清空所有球员吗？')) return;
+      clearAllPlayers();
+    });
+
+    groupCountSelect.addEventListener('change', () => {
+      clearGroupsDisplay();
+      hideValidation();
+      updateSwapSelectOptions();
+      groupColorIndices = [1, 2, 3, 4, 5];
+    });
+
+    swapColorsBtn.addEventListener('click', swapGroupColors);
+
+    // ---------- 初始化 ----------
+    renderTierCards();
+    updateSwapSelectOptions();
+
+    function addSamplePlayers() {
+      const samples = [
+        { name: '啪啪', tier: 'T0' }, { name: '唐洪超', tier: 'T0' },
+        { name: '腰哥', tier: 'T0' }, { name: '小林', tier: 'T1' },
+        { name: '放心飞', tier: 'T1' }, { name: '唯物唯心', tier: 'T2' },
+        { name: 'Oscar', tier: 'T2' }, { name: '波波', tier: 'T2' },
+        { name: '啵', tier: 'T2' }, { name: '彭彭孙', tier: 'T2' },
+        { name: '鑫鑫', tier: 'T2' }, { name: '小小', tier: 'T2' },
+        { name: '老顾', tier: 'T3' }, { name: '亮亮', tier: 'T3' },
+        { name: '老康桥', tier: 'T3' }, { name: '老陈', tier: 'T3' },
+        { name: '卡党', tier: 'T3' }, { name: '鬼宿', tier: 'T3' },
+        { name: 'Miracle', tier: 'T3' }, { name: 'jiabin', tier: 'T4' },
+        { name: '阿尼', tier: 'T3' }, { name: '头马', tier: 'T4' },
+        { name: '大个', tier: 'T4' }, { name: '喵喵', tier: 'T4' },
+      ];
+      samples.forEach(s => {
+        const id = nextId++;
+        const player = { id, name: s.name, tier: s.tier };
+        players.push(player);
+        playerMap.set(id, player);
+      });
+      TIERS.forEach(tier => renderTierPlayers(tier));
+      updateTotalCount();
+      clearGroupsDisplay();
+    }
+
+    addSamplePlayers();
+  })();
+</script>
+</body>
+</html>
