@@ -779,14 +779,14 @@
     function generateGroups() {
       const playerCount = players.length;
 
-      if (playerCount < 15) {
-        showValidation(`参与人数至少 15 人，当前 ${playerCount} 人`);
+      if (playerCount < 10) {
+        showValidation(`参与人数至少 10 人，当前 ${playerCount} 人`);
         return;
       }
 
       const groupCount = Number(groupCountSelect.value);
-      if (groupCount < 3 || groupCount > 5) {
-        showValidation('分组数量必须在 3~5 组之间');
+      if (groupCount < 2 || groupCount > 5) {
+        showValidation('分组数量必须在 2~5 组之间');
         return;
       }
 
@@ -1208,13 +1208,13 @@
 
     function addSamplePlayers() {
       const samples = [
-        { name: '啪啪', tier: 'T0' }, { name: '唐洪超', tier: 'T0' },
-        { name: '腰哥', tier: 'T0' }, { name: '小林', tier: 'T1' },
+        { name: '唐洪超', tier: 'T0' },
+        { name: '腰哥', tier: 'T0' }, { name: '小林', tier: 'T1' },{ name: '飞飞', tier: 'T1' },
         { name: '放心飞', tier: 'T1' }, { name: '唯物唯心', tier: 'T2' },
         { name: 'Oscar', tier: 'T2' }, { name: '波波', tier: 'T2' },
         { name: '啵', tier: 'T2' }, { name: '彭彭孙', tier: 'T2' },
         { name: '鑫鑫', tier: 'T2' }, { name: '小小', tier: 'T2' },
-        { name: '老顾', tier: 'T3' }, { name: '亮亮', tier: 'T3' },
+        { name: '顺', tier: 'T3' }, { name: '亮亮', tier: 'T3' },
         { name: '老康桥', tier: 'T3' }, { name: '老陈', tier: 'T3' },
         { name: '卡党', tier: 'T3' }, { name: '鬼宿', tier: 'T3' },
         { name: 'Miracle', tier: 'T3' }, { name: 'jiabin', tier: 'T4' },
